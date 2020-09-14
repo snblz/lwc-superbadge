@@ -17,13 +17,7 @@
         <!-- boatSearchResults goes here -->
         <!-- onloading={handleLoading} ondoneloading={handleDoneLoading} -->
         <div class="slds-m-around_large">
-          <p if:true={isLoading}>Content has been loaded.</p>
-  
-           <div if:false={isLoading} class="slds-is-relative">
-              <lightning-spinner variant="brand"
-                  alternative-text="Loading...">
-              </lightning-spinner>
-          </div>
+         <c-boat-search-results></c-boat-search-results>
       </div>
       </lightning-layout-item>
     </lightning-layout>
