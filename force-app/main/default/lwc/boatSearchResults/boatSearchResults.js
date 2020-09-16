@@ -1,17 +1,28 @@
-import { LightningElement, wire, api } from 'lwc';
-const SUCCESS_TITLE = 'Success';
-const MESSAGE_SHIP_IT     = 'Ship it!';
-const SUCCESS_VARIANT     = 'success';
-const ERROR_TITLE   = 'Error';
-const ERROR_VARIANT = 'error';
-
+import { LightningElement, wire, api, track } from 'lwc';
 import {  publish,
           subscribe,
           unsubscribe,
           APPLICATION_SCOPE,
           MessageContext } from 'lightning/messageService';
 import BOATMC from '@salesforce/messageChannel/BoatMessageChannel__c';
+import TILEMC from '@salesforce/messageChannel/TileMessageChannel__c';
 import getBoats from '@salesforce/apex/BoatDataService.getBoats';
+import { updateRecord } from 'lightning/uiRecordApi';
+import { refreshApex } from '@salesforce/apex';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+const SUCCESS_TITLE = 'Success';
+const MESSAGE_SHIP_IT     = 'Ship it!';
+const SUCCESS_VARIANT     = 'success';
+const ERROR_TITLE   = 'Error';
+const ERROR_VARIANT = 'error';
+const columns = [
+  { label: 'Name', fieldName: 'Name', editable: true },
+  { label: 'Length', fieldName: 'Length__c', editable: true},
+  { label: 'Price', fieldName: 'Price__c', type: 'currency', editable: true },
+  { label: 'Description', fieldName: 'Description__c', editable: true }
+];
+
 export default class BoatSearchResults extends LightningElement {
    
   subscription = null;
@@ -20,7 +31,9 @@ export default class BoatSearchResults extends LightningElement {
   boatTypeId = '';
   boats;
   isLoading = false;
-  
+  columns = columns;
+  @track draftValues = [];
+
   // wired message context
   @wire(MessageContext)
   messageContext;
@@ -28,11 +41,11 @@ export default class BoatSearchResults extends LightningElement {
 
   @wire(getBoats, {boatTypeId : '$boatTypeId'})
   wiredBoats(result) { 
-    console.log("wired method, with typeid: " + this.boatTypeId);
-    console.log("result: " + JSON.stringify(result));
+    //console.log("wired method, with typeid: " + this.boatTypeId);
+    //console.log("result: " + JSON.stringify(result));
     if (result.data) {
-      this.boats = result.data;      
-      console.log(JSON.stringify(this.boats));
+      this.boats = result.data;   
+      console.log("boats: " + JSON.stringify(this.boats));   
     };    
   }
   
@@ -48,7 +61,7 @@ export default class BoatSearchResults extends LightningElement {
   updateSelectedTile(event) { 
     console.log("updateSelectedTile: " + event.detail);
     const boatId = { recordId: event.detail };
-    publish(this.messageContext, BOATMC, boatId);
+    publish(this.messageContext, TILEMC, boatId);
   }
   
   // Publishes the selected boat Id on the BoatMC.
@@ -59,15 +72,28 @@ export default class BoatSearchResults extends LightningElement {
   // This method must save the changes in the Boat Editor
   // Show a toast message with the title
   // clear lightning-datatable draft values
-  handleSave() {
-   /* const recordInputs = event.detail.draftValues.slice().map(draft => {
+  handleSave(event) {
+    const recordInputs = event.detail.draftValues.slice().map(draft => {
         const fields = Object.assign({}, draft);
         return { fields };
     });
-    const promises = recordInputs.map(recordInput =>
+    console.log("recordInputs ==> " + JSON.stringify(recordInputs));
+    
+   const promises = recordInputs.map(recordInput =>{
             //update boat record
-        );
-    Promise.all(promises)
+         /*   var boat;
+            for(var index in this.boats){
+              boat = this.boats[index]; 
+              console.log("boat.Id: " + boat.Id + ", recordInput.Id: " + recordInput["fields"].Id);
+              if(boat.Id === recordInput["fields"].Id){
+                console.log("true");
+                if(recordInput["fields"].hasOwnProperty("Name")){
+                  this.boats[index]
+                }
+              }
+            }*/
+          });
+   /* Promise.all(promises)
         .then(() => {})
         .catch(error => {})
         .finally(() => {});*/
@@ -95,7 +121,6 @@ unsubscribeToMessageChannel() {
 // Handler for message received by component
 handleMessage(message) {
     this.boatTypeId = message.recordId;
-    console.log("boat type id:" + this.boatTypeId);
 }
 
 // Standard lifecycle hooks used to subscribe and unsubsubscribe to the message channel

@@ -7,10 +7,11 @@ import {  publish,
   APPLICATION_SCOPE,
   MessageContext } from 'lightning/messageService';
 import BOATMC from '@salesforce/messageChannel/BoatMessageChannel__c';
+import TILEMC from '@salesforce/messageChannel/TileMessageChannel__c';
 // imports
 export default class BoatTile extends LightningElement {
     @api boat;
-    @track selectedBoatId;
+    selectedBoatId;
     subscription = null;
     
     // wired message context
@@ -19,7 +20,7 @@ export default class BoatTile extends LightningElement {
     
     // Getter for dynamically setting the background image for the picture
     get backgroundStyle() { 
-      return 'background-image:url(' + this.boat.Picture__c + ')' ;
+      return 'background-image:url(' + this.boat.Picture__c + ')';
     }
     
     // Getter for dynamically setting the tile class based on whether the
@@ -41,7 +42,7 @@ export default class BoatTile extends LightningElement {
     if (!this.subscription) {
         this.subscription = subscribe(
             this.messageContext,
-            BOATMC,
+            TILEMC,
             (message) => this.handleMessage(message),
             { scope: APPLICATION_SCOPE }
         );
