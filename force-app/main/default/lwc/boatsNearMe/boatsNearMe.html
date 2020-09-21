@@ -2,6 +2,16 @@
     <lightning-card class="slds-is-relative">
        <!-- The template and lightning-spinner goes here -->
        <!-- The lightning-map goes here -->
-       <div slot="footer">Top 10 Only!</div>
+       <template if:true={mapMarkers}>
+        <lightning-map
+                map-markers={mapMarkers}>
+        </lightning-map>
+        </template>
+       <div slot="footer">Top 10 Only!
+           <div>
+              <lightning-button variant="brand" label="Get location" onclick={getLocationFromBrowser}></lightning-button> 
+           </div>
+       </div>
+
     </lightning-card>
 </template>

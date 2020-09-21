@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, track, wire } from 'lwc';
 import {  publish,
   subscribe,
   unsubscribe,
@@ -13,7 +13,7 @@ import BOATMC from '@salesforce/messageChannel/BoatMessageChannel__c';
 
 export default class BoatsNearMe extends LightningElement {
   boatTypeId;
-  mapMarkers = [];
+ @track mapMarkers = [];
   isLoading = true;
   isRendered;
   latitude;
@@ -33,7 +33,22 @@ export default class BoatsNearMe extends LightningElement {
   
   // Gets the location from the Browser
   // position => {latitude and longitude}
-  getLocationFromBrowser() { }
+  getLocationFromBrowser() {
+    console.log("getLocationFromBrowser: ");    
+    if(!navigator.geolocation) {
+        console.log('Geolocation is not supported by your browser');
+      } else {
+        console.log('Locating…');
+        navigator.geolocation.getCurrentPosition(function(e) {
+            this.latitude = e.coords.latitude;
+            this.longitude = e.coords.longitude;
+            console.log("MAP: lat{" + latitude + "}, long{" + longitude + "}"); 
+        }, function() {
+            console.log('There was an error.');
+        }); 
+      }
+      
+   }
   
   // Creates the map markers
   createMapMarkers(boatData) {
