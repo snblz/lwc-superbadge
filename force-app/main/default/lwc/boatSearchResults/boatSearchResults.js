@@ -73,30 +73,84 @@ export default class BoatSearchResults extends LightningElement {
   // Show a toast message with the title
   // clear lightning-datatable draft values
   handleSave(event) {
+    
     const recordInputs = event.detail.draftValues.slice().map(draft => {
         const fields = Object.assign({}, draft);
         return { fields };
-    });
+    })
+
+    var boatsForChange = this.boats.slice().map(obj => {
+      const boat = Object.assign({}, obj);
+      return { boat };
+    })
     console.log("recordInputs ==> " + JSON.stringify(recordInputs));
+    console.log("-----------------------------------------------------------------------"); 
+    console.log("boatsForChange ==> " + JSON.stringify(boatsForChange));
     
-   const promises = recordInputs.map(recordInput =>{
+   recordInputs.map(recordInput =>{
             //update boat record
-         /*   var boat;
-            for(var index in this.boats){
-              boat = this.boats[index]; 
-              console.log("boat.Id: " + boat.Id + ", recordInput.Id: " + recordInput["fields"].Id);
-              if(boat.Id === recordInput["fields"].Id){
+            var boat;
+            for(var index in boatsForChange){
+               boat = boatsForChange[index];
+              console.log("boat.Id: " + boat["boat"].Id + ", recordInput.Id: " + recordInput["fields"].Id);
+              if(boat["boat"].Id === recordInput["fields"].Id){
                 console.log("true");
                 if(recordInput["fields"].hasOwnProperty("Name")){
-                  this.boats[index]
+                  boat["boat"].Name = recordInput["fields"].Name;
                 }
-              }
-            }*/
+                if(recordInput["fields"].hasOwnProperty("Length__c")){
+                  boat["boat"].Length__c = recordInput["fields"].Length__c;
+                }
+                if(recordInput["fields"].hasOwnProperty("Price__c")){
+                  boat["boat"].Price__c = recordInput["fields"].Price__c;
+                }
+                if(recordInput["fields"].hasOwnProperty("Description__c")){
+                  boat["boat"].Description__c = recordInput["fields"].Description__c;
+                }
+              }              
+              boatsForChange[index] = boat;            
+            }  
+            //return boat["boat"];           
           });
+          
+          console.log("-----------------------------------------------------------------------"); 
+         console.log("boatsForChange ==> " + JSON.stringify(boatsForChange));   
+         
+         var tempObjBoats = boatsForChange.map(obj => {
+           return obj["boat"];
+         });
+         this.boats = tempObjBoats;
+          
+         console.log("-----------------------------------------------------------------------"); 
+         console.log("this.boats ==> " + JSON.stringify(this.boats));   
    /* Promise.all(promises)
         .then(() => {})
         .catch(error => {})
         .finally(() => {});*/
+        const promises = recordInputs.map(recordInput => updateRecord(recordInput));
+        Promise.all(promises).then(contacts => {        
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: SUCCESS_TITLE,
+                    message: MESSAGE_SHIP_IT,
+                    variant: SUCCESS_VARIANT
+                })
+            );
+            // Clear all draft values
+            this.draftValues = [];
+
+            // Display fresh data in the datatable
+            return refreshApex(this.wiredBoats);
+        }).catch(error => {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: ERROR_TITLE,
+                    message: error.body.message,
+                    variant: ERROR_VARIANT
+                })
+            );
+        });
+
   }
   // Check the current value of isLoading before dispatching the doneloading or loading custom event
   notifyLoading(isLoading) { }
