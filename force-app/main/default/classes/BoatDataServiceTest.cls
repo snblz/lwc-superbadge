@@ -94,7 +94,7 @@ public with sharing class BoatDataServiceTest {
         List<Boat__c> boat = [SELECT Id, Geolocation__Latitude__s, Geolocation__Longitude__s,BoatType__r.Id FROM Boat__c limit 1];
         System.assertEquals(1, boat.size(), 'There are no boats inserted.');
 
-        String locationSerial = BoatDataService.getBoatsByLocation(boat.get(0).Geolocation__Latitude__s, boat.get(0).Geolocation__Longitude__s, boat.get(0).BoatType__r.Id);
+        String locationSerial = BoatDataService.getBoatsByLocation( boat.get(0).BoatType__r.Id, boat.get(0).Geolocation__Latitude__s, boat.get(0).Geolocation__Longitude__s);
         List<Object> boatsByLocation = (List<Object>)JSON.deserializeUntyped(locationSerial);
         List<Boat__c> boatsExpected = [SELECT Id FROM Boat__c WHERE BoatType__c = :boat.get(0).BoatType__r.Id ORDER BY DISTANCE(Geolocation__c, GEOLOCATION(:boat.get(0).Geolocation__Latitude__s, :boat.get(0).Geolocation__Longitude__s), 'mi') LIMIT 10];
         System.assertEquals(boatsExpected.size(), boatsByLocation.size(), 'The Boats were not queried correctly depending on their localization.');

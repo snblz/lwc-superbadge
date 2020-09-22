@@ -7,7 +7,7 @@
           <lightning-button label="New Boat" title="add new boat action" onclick={createNewBoat} class="slds-m-left_x-small slds-float_right slds-p-right_medium"></lightning-button>
           <p class="slds-var-p-horizontal_small slds-align_absolute-center">
             <!-- boatSearchForm component goes here -->
-            <c-boat-search-form onsearchevent={searchBoats}></c-boat-search-form>
+            <c-boat-search-form onsearch={searchBoats}></c-boat-search-form>
           </p>
         </lightning-card>
       </lightning-layout-item>

@@ -1,10 +1,11 @@
-import { LightningElement, wire } from 'lwc';
-import { publish, MessageContext } from 'lightning/messageService';
-import BOAT_LOADING_MESSAGE from '@salesforce/messageChannel/BoatMessageChannel__c';
+import { LightningElement, wire, track, api } from 'lwc';
+//import { publish, MessageContext } from 'lightning/messageService';
+//import BOAT_LOADING_MESSAGE from '@salesforce/messageChannel/BoatMessageChannel__c';
 
 // imports
 // import getBoatTypes from the BoatDataService => getBoatTypes method';
 import getBoatTypes from '@salesforce/apex/BoatDataService.getBoatTypes';
+
 export default class BoatSearchForm extends LightningElement {
     selectedBoatTypeId = '';
     
@@ -12,7 +13,7 @@ export default class BoatSearchForm extends LightningElement {
     error = undefined;
     
     // Needs explicit track due to nested data
-    searchOptions;
+    @track searchOptions;
     
     // Wire a custom Apex method
     @wire(getBoatTypes)
@@ -36,8 +37,7 @@ export default class BoatSearchForm extends LightningElement {
       // Create the const searchEvent
       // searchEvent must be the new custom event search
       this.selectedBoatTypeId = event.target.value;
-      console.log("target val: " + this.selectedBoatTypeId);
-      const searchEvent = new CustomEvent('searchevent', {detail: this.selectedBoatTypeId});
+      const searchEvent = new CustomEvent('search', {detail: {boatTypeId : this.selectedBoatTypeId}});
       this.dispatchEvent(searchEvent);
     }
   }
