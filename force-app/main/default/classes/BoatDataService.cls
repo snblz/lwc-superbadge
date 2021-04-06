@@ -55,9 +55,11 @@ public with sharing class BoatDataService {
         return boatsList;
     }
 
-    @AuraEnabled
+    
+    @AuraEnabled(cacheable=true)
     public static List<BoatReview__c> getAllReviews(String boatId){
-        List<BoatReview__c> boatReviews = [SELECT Name, Comment__c, Rating__c 
+        System.debug('boatId: ' + boatId);
+        List<BoatReview__c> boatReviews = [SELECT Name, Comment__c, Rating__c, CreatedBy.Name, CreatedBy.CompanyName, CreatedBy.SmallPhotoUrl  
                                             FROM BoatReview__c
                                             WHERE Boat__c = :boatId];
         return boatReviews;

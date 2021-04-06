@@ -1,42 +1,30 @@
-import { LightningElement, wire } from 'lwc';
- // imports
- import { NavigationMixin } from 'lightning/navigation'; 
-//import BOATMC from '@salesforce/...';
-import { publish, MessageContext } from 'lightning/messageService';
-import BOATMC from '@salesforce/messageChannel/BoatMessageChannel__c';
+import { LightningElement , track ,api} from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+// imports
 export default class BoatSearch extends NavigationMixin(LightningElement) {
-    isLoading = false;
+    @track isLoading = true;
     
-    @wire(MessageContext)
-    messageContext;
-
-    // Handles loading event
-    handleLoading() {
-      this.isLoading = true;
-     }
-    
-    // Handles done loading event
-    handleDoneLoading() { 
-      this.isLoading = false;
+    handleLoading()
+    {
+        this.isLoading = true;
+    } 
+    handleDoneLoading()
+    {
+        this.isLoading = false;
     }
-    
-    // Handles search boat event  
-    // This custom event comes from the form
-    searchBoats(event) { 
-      console.log("searchBoats: ");
-      console.log(event.detail);
-      const boatId = { recordId: event.detail.boatTypeId };
-      publish(this.messageContext, BOATMC, boatId);
-    }
-    
-    createNewBoat() {      
+    createNewBoat() {
         this[NavigationMixin.Navigate]({
             type: 'standard__objectPage',
             attributes: {
                 objectApiName: 'Boat__c',
                 actionName: 'new'
-            },
+            }
         });
-      }
-     
-  }
+    }
+    
+    searchBoats(event)
+    {
+        this.boatTypeId = event.detail.boatTypeId;
+        this.template.querySelector('c-boat-search-results').searchBoats(this.boatTypeId);
+    }
+}

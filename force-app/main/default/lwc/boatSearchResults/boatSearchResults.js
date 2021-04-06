@@ -43,6 +43,7 @@ export default class BoatSearchResults extends LightningElement {
     }
 
     updateSelectedTile(event) {
+        console.log("updateSelectedTile boat: " + this.selectedBoatId);
         this.selectedBoatId = event.detail.boatId;
         this.sendMessageService(this.selectedBoatId);
     }

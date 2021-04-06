@@ -8,7 +8,7 @@ import {
 
 import BOATMC from '@salesforce/messageChannel/BoatMessageChannel__c';
 import { getRecord } from 'lightning/uiRecordApi';
-const LONGITUDE_FIELD = 'Boat__c.Geolocation__Longitude__s';
+import LONGITUDE_FIELD from '@salesforce/schema/Boat__c.Geolocation__Longitude__s';
 const LATITUDE_FIELD = 'Boat__c.Geolocation__Latitude__s';
 const BOAT_FIELDS = [LONGITUDE_FIELD, LATITUDE_FIELD];
 
@@ -19,6 +19,9 @@ export default class BoatMap extends LightningElement {
   // private
   subscription = null;
   boatId;
+  isLoading = false;
+  isRendered = false;
+
 
   // Getter and Setter to allow for logic to run on recordId change
   // this getter must be public
@@ -40,7 +43,7 @@ export default class BoatMap extends LightningElement {
   // Getting record's location to construct map markers using recordId
   // Wire the getRecord method using ('$boatId')
   @wire(getRecord,{
-    recordId:'$boatId',
+    recordId:`${boatId}`,
     fields:BOAT_FIELDS
   })
    wiredRecord({ error, data }) {
@@ -90,7 +93,7 @@ export default class BoatMap extends LightningElement {
 
   subscribeMC() {
     let subscription = subscribe(this.messageContext, BOATMC, (message) => { this.boatId = message.recordId }, { scope: APPLICATION_SCOPE });
-        }
+  }
 
   disconnectedCallback() {
     this.unsubscribeToMessageChannel();
@@ -106,5 +109,11 @@ export default class BoatMap extends LightningElement {
   // Getter method for displaying the map component, or a helper method.
   get showMap() {
     return this.mapMarkers.length > 0;
+  }
+
+  init() {
+    console.log("### init log: ");
+    console.log("### LONGITUDE_FIELD: " + LONGITUDE_FIELD);
+    console.log("### LATITUDE_FIELD: " + LATITUDE_FIELD);
   }
 }

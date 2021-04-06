@@ -16,9 +16,15 @@
         <!-- Spinner goes here -->
         <!-- boatSearchResults goes here -->
         <!-- onloading={handleLoading} ondoneloading={handleDoneLoading} -->
-        <lightning-card >
-          <c-boat-search-results></c-boat-search-results>
-        </lightning-card>
+        <template if:true={isLoading}>
+          <lightning-spinner alternative-text="Loading" variant="brand">
+         </lightning-spinner> 
+         </template>
+        
+          <lightning-card>
+            <c-boat-search-results onloading={handleLoading} ondoneloading={handleDoneLoading}></c-boat-search-results>
+          </lightning-card>
+         
       </lightning-layout-item>
     </lightning-layout>
   </template>
