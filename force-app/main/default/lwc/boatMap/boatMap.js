@@ -43,7 +43,7 @@ export default class BoatMap extends LightningElement {
   // Getting record's location to construct map markers using recordId
   // Wire the getRecord method using ('$boatId')
   @wire(getRecord,{
-    recordId:`${boatId}`,
+    recordId:'$boatId',
     fields:BOAT_FIELDS
   })
    wiredRecord({ error, data }) {
